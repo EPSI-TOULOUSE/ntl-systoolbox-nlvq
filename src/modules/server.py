@@ -1,8 +1,8 @@
 from flask import Flask, abort, jsonify, request
 
-from utils.cpu import getCPUStatus
-from utils.memory import getMemStatus
-from utils.os import getOSStatus
+from src.utils.cpu import getCPUStatus
+from src.utils.memory import getMemStatus
+from src.utils.os import getOSStatus
 
 # Create http serveur
 app = Flask(__name__)

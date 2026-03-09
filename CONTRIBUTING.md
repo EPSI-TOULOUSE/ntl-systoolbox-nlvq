@@ -8,5 +8,5 @@ pip install '.[dev]'
 ```
 
 ```shell
-python src/main.py
+python -m src.main
 ```
