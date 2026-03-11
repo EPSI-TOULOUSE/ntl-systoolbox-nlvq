@@ -1,0 +1,5 @@
+# Ignore everything
+**
+
+!pyproject.toml
+!src/
