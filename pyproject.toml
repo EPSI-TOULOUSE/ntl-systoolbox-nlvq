@@ -1,0 +1,49 @@
+[project]
+name = "NTL-systoolbox"
+version = "0.0.0"
+readme = "README.md"
+requires-python = ">=3.14.3"
+
+dependencies = [
+	"pyyaml>=6.0.1",
+	"pywinrm>=0.4.3",
+	"paramiko>=3.4.0",
+	"mysql-connector-python>=8.3.0"
+]
+
+[project.optional-dependencies]
+dev = [
+	"ruff>=0.15.5",
+	"black==26.3.0",
+	"pre_commit==4.5.1",
+	"pyinstaller==6.19.0"
+]
+
+[project.urls]
+Repository = "https://github.com/EPSI-TOULOUSE/ntl-systoolbox-nlvq.git"
+Issues = "https://github.com/EPSI-TOULOUSE/ntl-systoolbox-nlvq.git/issues"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+skip-string-normalization = true
+preview = true
+
+[tool.ruff]
+fix = true
+line-length = 88
+target-version = "py310"
+lint.select = [ "E", "F", "I", "B", "UP", "SIM" ]
+lint.ignore = [ "E203" ]
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["ntl"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
