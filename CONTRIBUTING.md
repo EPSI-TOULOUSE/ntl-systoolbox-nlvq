@@ -8,11 +8,11 @@ pip install '.[dev]'
 ```
 
 ```shell
-python main.py
+python src/main.py
 ```
 
 ## Build binaries
 
 ```shell
-pyinstaller main.py --onefile --name ntl
+pyinstaller src/main.py --onefile --name ntl
 ```
