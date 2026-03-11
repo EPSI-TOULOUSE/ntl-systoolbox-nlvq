@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from src.modules import server
+from modules import server
 
 
 def run(args):

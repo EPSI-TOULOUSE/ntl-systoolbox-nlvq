@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from src.commands import server
+from commands import server
 
 
 def main():

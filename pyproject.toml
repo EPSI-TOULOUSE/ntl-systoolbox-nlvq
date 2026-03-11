@@ -16,12 +16,12 @@ dev = [
 	"black==26.3.0",
 	"click==8.3.1",
 	"mypy_extensions==1.1.0",
-	"NTL-systoolbox @ file:///home/h33n0k/dev/ntl-systoolbox-nlvq",
 	"packaging==26.0",
 	"pathspec==1.0.4",
 	"platformdirs==4.9.4",
 	"pytokens==0.4.1",
-	"ruff==0.15.5"
+	"ruff==0.15.5",
+	"pyinstaller==6.19.0"
 ]
 
 [project.urls]
