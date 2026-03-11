@@ -1,10 +1,13 @@
 import argparse
+import logging
 
 from src.modules import server
 
 
 def run(args):
-    server.app.run(host="0.0.0.0", port=5000)
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    server.app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
 
 
 def register(subparsers):
