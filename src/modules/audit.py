@@ -24,7 +24,7 @@ from pathlib import Path
 
 logger = logging.getLogger('audit')
 
-RAPPORT_DIR = Path(__file__).resolve().parent.parent / 'rapports'
+RAPPORT_DIR = Path(__file__).resolve().parent.parent.parent / 'rapports'
 RAPPORT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────

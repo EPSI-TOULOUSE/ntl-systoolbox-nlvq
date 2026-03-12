@@ -21,7 +21,7 @@ from pathlib import Path
 logger = logging.getLogger('backup')
 
 # Dossier de sauvegarde (relatif à la racine du projet)
-BACKUP_DIR = Path(__file__).resolve().parent.parent / 'backups'
+BACKUP_DIR = Path(__file__).resolve().parent.parent.parent / 'backups'
 BACKUP_DIR.mkdir(parents=True, exist_ok=True)
 
 

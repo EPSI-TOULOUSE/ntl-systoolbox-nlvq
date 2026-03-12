@@ -21,8 +21,8 @@ import yaml
 # Chemins de base (compatibilité Windows / Linux via pathlib)
 # ──────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent
-CONFIG_FILE = BASE_DIR / 'config.yaml'
-LOG_DIR = BASE_DIR / 'logs'
+CONFIG_FILE = BASE_DIR.parent / 'config.yaml'
+LOG_DIR = BASE_DIR.parent / 'logs'
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────
