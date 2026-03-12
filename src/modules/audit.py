@@ -18,33 +18,19 @@ import ipaddress
 import json
 import logging
 import platform
+import re
 import subprocess
 from datetime import date, datetime
 from pathlib import Path
+
+import requests
 
 logger = logging.getLogger('audit')
 
 RAPPORT_DIR = Path(__file__).resolve().parent.parent.parent / 'rapports'
 RAPPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ──────────────────────────────────────────────────────────
-# Base de données EOL interne
-# Clé : nom du système | Valeur : date de fin de support
-# Sources : Microsoft / Canonical
-# ──────────────────────────────────────────────────────────
-BASE_EOL: dict[str, date] = {
-    # Windows Server
-    'Windows Server 2012': date(2023, 10, 10),
-    'Windows Server 2012 R2': date(2023, 10, 10),
-    'Windows Server 2016': date(2027, 1, 12),
-    'Windows Server 2019': date(2029, 1, 9),
-    'Windows Server 2022': date(2031, 10, 14),
-    # Ubuntu LTS
-    'Ubuntu 20.04': date(2025, 4, 2),
-    'Ubuntu 22.04': date(2027, 4, 1),
-    'Ubuntu 24.04': date(2029, 4, 1),
-}
-
+EOL_API_BASE = 'https://endoflife.date/api/v1'
 SEUIL_WARNING_JOURS = 180  # 6 mois
 
 
@@ -57,41 +43,48 @@ def _horodatage() -> str:
 
 def _statut_eol(nom_systeme: str) -> dict:
     """
-    Retourne le statut EOL pour un système donné.
+    Vérifie le statut EOL d'un OS + version via l'API endoflife.date.
 
     :param nom_systeme: nom du système (ex: 'Windows Server 2019')
     :return: dict avec 'eol_date', 'statut', 'jours_restants'
     """
-    aujourd_hui = date.today()
 
-    # Recherche par correspondance partielle
-    eol_date = None
-    for cle, val in BASE_EOL.items():
-        if cle.lower() in nom_systeme.lower():
-            eol_date = val
-            break
-
-    if eol_date is None:
-        return {
-            'eol_date': 'Inconnue',
-            'statut': 'Inconnu',
-            'jours_restants': None,
-        }
-
-    jours_restants = (eol_date - aujourd_hui).days
-
-    if jours_restants < 0:
-        statut = 'Critical'
-    elif jours_restants <= SEUIL_WARNING_JOURS:
-        statut = 'Warning'
-    else:
-        statut = 'Supported'
-
-    return {
-        'eol_date': eol_date.isoformat(),
-        'statut': statut,
-        'jours_restants': jours_restants,
+    result = {
+        'eol_date': 'Inconue',
+        'statut': 'Inconu',
+        'jours_restants': 'Inconu',
     }
+
+    name = nom_systeme.strip().lower()
+    product = re.sub(r'\s', r'-', re.sub(r'\S*$', r'', name).strip())
+    version = re.search(r'(\S+)$', name).group(1)
+    if product and version:
+        try:
+            resp = requests.get(
+                f'{EOL_API_BASE}/products/{product}/releases/{version}', timeout=5
+            )
+            resp.raise_for_status()
+            data = resp.json()['result']
+
+            result['eol_date'] = data['eolFrom']
+
+            today = date.today()
+            eol_date = datetime.strptime(result['eol_date'], '%Y-%m-%d').date()
+            diff = (eol_date - today).days
+
+            result['jours_restants'] = diff
+
+            if diff < 0:
+                result['statut'] = 'Critical'
+            elif diff <= SEUIL_WARNING_JOURS:
+                result['statut'] = 'Warning'
+            else:
+                result['statut'] = 'Supported'
+
+        except requests.RequestException:
+            pass
+
+    return result
 
 
 # ──────────────────────────────────────────────────────────
