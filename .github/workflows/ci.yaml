@@ -1,0 +1,88 @@
+---
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: write
+
+jobs:
+
+  release:
+    runs-on: ubuntu-latest
+
+    outputs:
+      released: ${{ steps.semantic.outputs.released }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install deps
+        run: |
+          pip install '.[dev]'
+
+      - name: semantic release
+        id: semantic
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          semantic-release publish
+
+  build:
+
+    needs: release
+    if: needs.release.outputs.released == 'true'
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: install deps
+        run: |
+          pip install pyinstaller
+
+      - name: build binary
+        run: |
+          pyinstaller main.py \
+            --onefile \
+            --clean \
+            --noconfirm \
+            --name myapp
+
+      - name: rename binary
+        shell: bash
+        run: |
+          mkdir upload
+
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            mv dist/ntl upload/ntl-linux
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            mv dist/ntl.exe upload/ntl-windows.exe
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            mv dist/ntl upload/ntl-macos
+          fi
+
+      - name: upload binaries
+        uses: softprops/action-gh-release@v2
+        with:
+          files: upload/*
+...
