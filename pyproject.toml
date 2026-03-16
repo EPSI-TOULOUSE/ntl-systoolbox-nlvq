@@ -17,7 +17,8 @@ dev = [
 	"ruff>=0.15.5",
 	"black==26.3.0",
 	"pre_commit==4.5.1",
-	"pyinstaller==6.19.0"
+	"pyinstaller==6.19.0",
+	"python-semantic-release==10.5.3"
 ]
 
 [project.urls]
@@ -48,3 +49,13 @@ known-first-party = ["ntl"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+build_command = ""
+allowed_tags = ["feat", "fix", "perf", "refactor"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
+upload_to_pypi = false
+upload_to_release = true
+branch = "dev"
